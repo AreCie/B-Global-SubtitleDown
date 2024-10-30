@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        哔哩哔哩国际版(B-Global)字幕下载1
+// @name        哔哩哔哩国际版(B-Global)字幕下载
 // @namespace   https://github.com/AreCie
 // @version     1.0
 // @description 下载bilibili国际版字幕；注意：切勿频繁请求，可能会造成风控！
