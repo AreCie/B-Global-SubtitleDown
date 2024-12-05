@@ -7,7 +7,7 @@
 // @homepage    https://github.com/AreCie/B-Global-SubtitleDown
 // @supportURL  https://github.com/AreCie/B-Global-SubtitleDown/issues
 // @author      AreCie
-// @match       https://www.bilibili.tv/(en/)?play/*
+// @match       https://www.bilibili.tv/*play/*
 // @icon        https://p.bstarstatic.com/fe-static/deps/bilibili_tv.ico?v=1
 // @require     https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js
 // @grant       none
