@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name        哔哩哔哩国际版(B-Global)字幕下载
 // @namespace   https://github.com/AreCie
-// @version     1.0
+// @version     1.2
 // @description 下载bilibili国际版字幕；注意：切勿频繁请求，可能会造成风控！
 // @license     AGPL-3.0-or-later
 // @homepage    https://github.com/AreCie/B-Global-SubtitleDown
 // @supportURL  https://github.com/AreCie/B-Global-SubtitleDown/issues
 // @author      AreCie
-// @match       https://www.bilibili.tv/en/play/*
+// @match       https://www.bilibili.tv/*play/*
 // @icon        https://p.bstarstatic.com/fe-static/deps/bilibili_tv.ico?v=1
 // @require     https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js
 // @grant       none
@@ -119,18 +119,66 @@
     const observer = new MutationObserver(insertButton);
     observer.observe(document.body, { childList: true, subtree: true });
 
+    // 将 JSON 字幕转换为 SRT 格式
+    function convertJsonToSrt(jsonContent) {
+        // 将秒转换为 SRT 时间格式 (hh:mm:ss,ms)
+        function secondsToSrtTime(seconds) {
+            const hours = Math.floor(seconds / 3600).toString().padStart(2, '0');
+            const minutes = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+            const secs = Math.floor(seconds % 60).toString().padStart(2, '0');
+            const millis = Math.round((seconds % 1) * 1000).toString().padStart(3, '0');
+            return `${hours}:${minutes}:${secs},${millis}`;
+        }
+
+        const subtitles = jsonContent.body;
+        let srtContent = "";
+
+        subtitles.forEach((subtitle, index) => {
+            const startTime = secondsToSrtTime(subtitle.from);
+            const endTime = secondsToSrtTime(subtitle.to);
+            srtContent += `${index + 1}\n`; // 编号
+            srtContent += `${startTime} --> ${endTime}\n`; // 时间
+            srtContent += `${subtitle.content}\n\n`; // 内容和换行
+        });
+
+        return srtContent.trim(); // 去掉末尾的多余换行
+    }
+
+    function processSrtFile(blob, filename) {
+        const reader = new FileReader();
+        reader.onload = function () {
+            try {
+                const jsonContent = JSON.parse(reader.result);
+                const srtContent = convertJsonToSrt(jsonContent);
+                const srtBlob = new Blob([srtContent], { type: 'text/plain' });
+                triggerDownload(srtBlob, filename);
+            } catch (error) {
+                console.error('解析或转换失败:', error);
+            }
+        };
+        reader.readAsText(blob);
+    }
+
+    function triggerDownload(blob, filename) {
+        const downloadUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(downloadUrl);
+    }
+
     function downloadFile(url, filename) {
         fetch(url)
             .then(response => response.blob())
             .then(blob => {
-                const downloadUrl = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = downloadUrl;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(downloadUrl);
+                if (filename.toLowerCase().endsWith('.srt')) {
+                    processSrtFile(blob, filename);
+                } else {
+                    triggerDownload(blob, filename);
+                }
             })
             .catch(error => console.error('下载失败:', error));
     }
@@ -167,6 +215,9 @@
                 itemDiv.className = "sub-item";
                 itemDiv.innerHTML = '';
 
+                // const checkElem = document.createElement('input');
+                // checkElem.type = "checkbox"
+                // itemDiv.appendChild(checkElem);
                 const langSpan = document.createElement('span');
                 langSpan.style.width = '120px';
                 langSpan.textContent = item.lang;
@@ -295,7 +346,22 @@
                     fetch(d.url)
                         .then(response => response.blob())
                         .then(blob => {
-                            zip.file(d.title, blob);
+                            if (d.title.toLowerCase().endsWith('.srt')) {
+                                const reader = new FileReader();
+                                reader.onload = function () {
+                                    try {
+                                        const jsonContent = JSON.parse(reader.result);
+                                        const srtContent = convertJsonToSrt(jsonContent);
+                                        const srtBlob = new Blob([srtContent], { type: 'text/plain' });
+                                        zip.file(d.title, srtBlob);
+                                    } catch (error) {
+                                        console.error('解析或转换失败:', error);
+                                    }
+                                };
+                                reader.readAsText(blob);
+                            } else {
+                                zip.file(d.title, blob);
+                            }
                         })
                 );
 
