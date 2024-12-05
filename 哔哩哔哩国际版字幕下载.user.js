@@ -1,13 +1,13 @@
 // ==UserScript==
 // @name        哔哩哔哩国际版(B-Global)字幕下载
 // @namespace   https://github.com/AreCie
-// @version     1.0
+// @version     1.1
 // @description 下载bilibili国际版字幕；注意：切勿频繁请求，可能会造成风控！
 // @license     AGPL-3.0-or-later
 // @homepage    https://github.com/AreCie/B-Global-SubtitleDown
 // @supportURL  https://github.com/AreCie/B-Global-SubtitleDown/issues
 // @author      AreCie
-// @match       https://www.bilibili.tv/en/play/*
+// @match       https://www.bilibili.tv/(en/)?play/*
 // @icon        https://p.bstarstatic.com/fe-static/deps/bilibili_tv.ico?v=1
 // @require     https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js
 // @grant       none
