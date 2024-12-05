@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name        哔哩哔哩国际版(B-Global)字幕下载
 // @namespace   https://github.com/AreCie
-// @version     1.1
+// @version     1.2
 // @description 下载bilibili国际版字幕；注意：切勿频繁请求，可能会造成风控！
 // @license     AGPL-3.0-or-later
 // @homepage    https://github.com/AreCie/B-Global-SubtitleDown
